@@ -1,0 +1,10 @@
+PATCH NOTES
+===========
+- Added topic extraction from bracket text: (Topic)
+- Caption order: Topic (separate section) -> File -> Batch (as requested)
+- Topic-wise index is accumulated FIRST, saved to Mongo (if db.* function exists) and JSON (topic_index_<batch>.json), then posted
+- /drm command enabled in private, groups, and channels (requires admin in groups/channels)
+- Uses your existing helper functions (ug.helper) to keep previous downloading logic
+- Minimal risk to other files; original main.py backed up as main.backup.py
+
+If your db module exposes different function names to save indexes, update try_db_save_index(...) accordingly.
