@@ -19,7 +19,7 @@ class Database:
             self.db = self.client['ugdev_db']
             self.users = self.db['users']
             self.settings = self.db['user_settings']  # New collection for settings
-            self.topic_indexes = self.db['topic_indexes']  # New collection for topic-wise indexes
+        self.topic_indexes = self.db['topic_indexes']
             print(f"{Fore.GREEN}✓ MongoDB Connected Successfully!{Style.RESET_ALL}")
             
             print(f"{Fore.YELLOW}⌛ Setting up database...{Style.RESET_ALL}")
@@ -370,12 +370,11 @@ try:
 except Exception as e:
     print(f"{Fore.RED}✕ Fatal Error: Could not initialize database{Style.RESET_ALL}")
     raise e
-
     def save_topic_index(self, batch_name: str, topic_index: dict, bot_username: str = "ugdevbot"):
         try:
             self.topic_indexes.update_one(
                 {"bot_username": bot_username, "batch_name": batch_name},
-                {"$set": {"bot_username": bot_username, "batch_name": batch_name, "index": topic_index, "updated_at": datetime.utcnow()}},
+                {"$set": {"bot_username": bot_username, "batch_name": batch_name, "index": topic_index}},
                 upsert=True
             )
             return True

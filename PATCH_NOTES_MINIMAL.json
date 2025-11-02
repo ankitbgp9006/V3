@@ -1,0 +1,16 @@
+{
+  "project_root": "/mnt/data/min_addon_repo/Ugupl-main",
+  "patch_type": "MINIMAL_ADDON",
+  "changes": [
+    "Added extract_topic helper in main.py",
+    "Added persist_topic_index_json in main.py",
+    "Added try_db_save_index in main.py",
+    "Added get_or_create_forum_topic (minimal) in main.py",
+    "Injected topic_threads/is_forum/topic_index in DRM handler (minimal)",
+    "Added post-upload index persist & post in DRM handler (minimal)",
+    "Added split_files/output_file init in ug.py download_video (minimal)",
+    "send_vid now accepts **kwargs and forwards thread id (minimal)",
+    "Added topic_indexes collection in db.py (minimal)",
+    "Added save_topic_index/get_topic_index in db.py (minimal)"
+  ]
+}
