@@ -370,3 +370,22 @@ try:
 except Exception as e:
     print(f"{Fore.RED}✕ Fatal Error: Could not initialize database{Style.RESET_ALL}")
     raise e
+
+    def save_topic_index(self, batch_name: str, topic_index: dict, bot_username: str = "ugdevbot"):
+        try:
+            self.topic_indexes.update_one(
+                {"bot_username": bot_username, "batch_name": batch_name},
+                {"$set": {"bot_username": bot_username, "batch_name": batch_name, "index": topic_index, "updated_at": datetime.utcnow()}},
+                upsert=True
+            )
+            return True
+        except Exception as e:
+            print("save_topic_index error:", e)
+            return False
+
+    def get_topic_index(self, batch_name: str, bot_username: str = "ugdevbot"):
+        try:
+            return self.topic_indexes.find_one({"bot_username": bot_username, "batch_name": batch_name}, {"_id": 0})
+        except Exception as e:
+            print("get_topic_index error:", e)
+            return None

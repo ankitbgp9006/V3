@@ -1,3 +1,24 @@
+
+def _looks_like_username(s: str) -> bool:
+    return isinstance(s, str) and (s.startswith("@") or s.lower().startswith("t.me/") or s.lower().startswith("https://t.me/"))
+
+async def parse_target_id(client: Client, ch_text: str, fallback_id: int) -> int:
+    """
+    Accepts -100..., numeric, @username, or t.me/<name> and returns numeric id.
+    """
+    try:
+        if not ch_text or ch_text.strip() in ("/d", "/D"):
+            return fallback_id
+        s = ch_text.strip()
+        if _looks_like_username(s):
+            uname = s.replace("https://t.me/", "").replace("t.me/", "").lstrip("@").split("/")[0]
+            chat = await client.get_chat(uname)
+            return chat.id
+        # numeric
+        return int(s)
+    except Exception:
+        return fallback_id
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -123,6 +144,8 @@ async def start_cmd(client: Client, m: Message):
 # ------------------ /drm ------------------
 @bot.on_message(filters.command(["drm"]) & (filters.private | filters.group | filters.channel))
 async def drm_handler(client: Client, m: Message):
+    # ### DRM_MAIN_TRY
+    try:
     """
     Flow:
     1) Accept text file with lines "Name ... : https://..."
@@ -251,7 +274,7 @@ async def drm_handler(client: Client, m: Message):
         await ans.delete(True)
     except Exception:
         ch_text = "/d"
-    channel_id = m.chat.id if ch_text == "/d" else int(ch_text)
+    channel_id = await parse_target_id(client, ch_text, m.chat.id)
 
     await editable.delete()
 
@@ -316,6 +339,12 @@ async def drm_handler(client: Client, m: Message):
             continue
 
     # Summary
+        except Exception as e:
+        try:
+            await m.reply_text(f"DRM error: {e}")
+        except Exception:
+            pass
+
     summary = (
         "<b>✨ Process Completed</b>\n\n"
         f"<blockquote><b>📌 Batch:</b> {b_name}</blockquote>\n"
@@ -369,3 +398,12 @@ async def drm_handler(client: Client, m: Message):
 if __name__ == "__main__":
     print("Starting Bot...")
     bot.run()
+
+
+@bot.on_message(filters.command("health") & (filters.private | filters.group | filters.channel))
+async def health(client, m):
+    try:
+        me = await client.get_me()
+        await m.reply_text(f"OK ✅\nBot: @{me.username}\nChat: {m.chat.id}")
+    except Exception as e:
+        await m.reply_text(f"Health error: {e}")
