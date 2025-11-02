@@ -392,16 +392,17 @@ async def download_video(url, cmd, name):
     max_retries = 2  # Reduced retries for faster failure handling
     retry_count = 0
     success = False
-    split_files = []  # <-- ALWAYS initialize
-    output_file = None
     
     while not success and retry_count < max_retries:
         try:
+            # Optimize download command with better aria2c parameters
             download_cmd = f'{cmd} -R 25 --fragment-retries 25 --external-downloader aria2c --downloader-args "aria2c: -x 16 -j 32 -s 16 -k 1M --file-allocation=none --optimize-concurrent-downloads=true"'
+
             print(f"\n⚡ Downloading...")
             k = subprocess.run(download_cmd, shell=True)
             
-            # Resolve output file
+            # Check if file exists and has size > 0
+            output_file = None
             if os.path.exists(f"{name}.mp4") and os.path.getsize(f"{name}.mp4") > 0:
                 output_file = f"{name}.mp4"
                 success = True
@@ -409,13 +410,15 @@ async def download_video(url, cmd, name):
                 output_file = name
                 success = True
             
-            if success and output_file:
-                # Split if > 2GB
+            if success:
+                # Check if file needs to be split (only for files > 2GB)
                 if os.path.getsize(output_file) > 2 * 1024 * 1024 * 1024:
                     split_files = await split_file(output_file)
+                if len(split_files) > 1:
+                    return split_files
+                    break
                 else:
-                    split_files = [output_file]
-                return split_files
+                    return [output_file]
             
             if not success:
                 print(f"\n⚠️ Retry {retry_count + 1}...")
@@ -427,16 +430,23 @@ async def download_video(url, cmd, name):
             retry_count += 1
             await asyncio.sleep(2)
     
-    # Final fallbacks to locate any produced file
+    # Final check for file existence
     try:
-        candidates = [name, f"{name}.webm", f"{name}.mkv", f"{name}.mp4", f"{name}.mp4.webm"]
-        out = []
-        for p in candidates:
-            if os.path.isfile(p):
-                out.append(p)
-        return out if out else [f"{name}.mp4"]
-    except Exception:
-        return [f"{name}.mp4"]
+        if os.path.isfile(name):
+            return [name]
+        elif os.path.isfile(f"{name}.webm"):
+            return [f"{name}.webm"]
+        name = name.split(".")[0]
+        if os.path.isfile(f"{name}.mkv"):
+            return [f"{name}.mkv"]
+        elif os.path.isfile(f"{name}.mp4"):
+            return [f"{name}.mp4"]
+        elif os.path.isfile(f"{name}.mp4.webm"):
+            return [f"{name}.mp4.webm"]
+        return [name]
+    except FileNotFoundError:
+        return [name + ".mp4"]
+
 
 async def send_doc(bot: Client, m: Message, cc, ka, cc1, prog, count, name, channel_id):
     # First send to user
@@ -487,10 +497,9 @@ async def download_and_decrypt_video(url, cmd, name, key):
             print(f"Failed to decrypt {video_path}.")  
             return None  
 
-async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id, watermark="Mr.UC", **kwargs):
+async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id, watermark="Mr.UC"):
     # Get log channel ID (don't validate)
     log_channel = db.get_log_channel(bot.me.username)
-    message_thread_id = kwargs.get('message_thread_id')
     
     # Check if filename is a list (split files)
     if isinstance(filename, list) and len(filename) > 1:
@@ -516,18 +525,16 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
             try:
                 # First send video to user
                 sent_video = await bot.send_video(
-                    channel_id,
+                    channel_id, 
                     part,
                     caption=f"{cc}\n\nPart {i}/{len(filename)}", 
                     supports_streaming=True,
                     height=720,
                     width=1280,
-                    **({"message_thread_id": message_thread_id} if message_thread_id else {}),
                     thumb=thumbnail,
                     duration=dur,
                     progress=progress_bar,
-                    progress_args=(reply, start_time),
-                    **({"message_thread_id": message_thread_id} if message_thread_id else {})
+                    progress_args=(reply, start_time)
                 )
                 
                 # Try forwarding to log channel
@@ -551,8 +558,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                         part,
                         caption=f"{cc}\n\nPart {i}/{len(filename)}",
                         progress=progress_bar,
-                        progress_args=(reply, start_time),
-                        **({"message_thread_id": message_thread_id} if message_thread_id else {})
+                        progress_args=(reply, start_time)
                     )
                     
                     # Try forwarding document to log channel
@@ -571,7 +577,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
             os.remove(part)
             await reply.delete(True)
             
-            if thumb in ["/d", "no"] and 'temp_thumb' in locals() and os.path.exists(temp_thumb):
+            if thumb in ["/d", "no"] and os.path.exists(temp_thumb):
                 os.remove(temp_thumb)
             
             await asyncio.sleep(1)
@@ -610,7 +616,6 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                 supports_streaming=True,
                 height=720,
                 width=1280,
-                **({"message_thread_id": message_thread_id} if message_thread_id else {}),
                 thumb=thumbnail,
                 duration=dur,
                 progress=progress_bar,
@@ -638,8 +643,7 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
                     filename,
                     caption=cc,
                     progress=progress_bar,
-                    progress_args=(reply, start_time),
-                    **({"message_thread_id": message_thread_id} if message_thread_id else {})
+                    progress_args=(reply, start_time)
                 )
                 
                 # Try forwarding document to log channel
@@ -658,5 +662,5 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, cha
         os.remove(filename)
         await reply.delete(True)
         
-        if thumb in ["/d", "no"] and 'temp_thumb' in locals() and os.path.exists(temp_thumb):
+        if thumb in ["/d", "no"] and os.path.exists(temp_thumb):
             os.remove(temp_thumb)
