@@ -1,3 +1,4 @@
+from typing import Optional
 
 def _looks_like_username(s: str) -> bool:
     return isinstance(s, str) and (s.startswith("@") or s.lower().startswith("t.me/") or s.lower().startswith("https://t.me/"))
@@ -93,26 +94,23 @@ def try_db_save_index(batch_name: str, topic_index: dict):
 def sanitize_filename(name: str, limit: int = 60) -> str:
 
 # --- Forum Topic Helpers (auto topic create & use) ---
-async def get_or_create_forum_topic(bot: Client, chat_id: int, title: str) -> typing.Optional[int]:
-    """
-    Create or fetch a forum topic in a supergroup with topics enabled.
-    Returns the message_thread_id usable in send_* calls.
-    """
+
+async def get_or_create_forum_topic(bot: Client, chat_id: int, title: str) -> Optional[int]:
+    """Create or fetch a forum topic thread id if the chat supports topics."""
     try:
         chat = await bot.get_chat(chat_id)
         if not getattr(chat, "is_forum", False):
             return None
-        topic = await bot.create_forum_topic(chat_id, title[:128] if title else "Topic")
+        # Pyrogram v2: create_forum_topic(chat_id, name, icon_color=None, icon_custom_emoji_id=None)
+        name = (title or "Topic").strip()[:128]
+        topic = await bot.create_forum_topic(chat_id, name)
         return getattr(topic, "message_thread_id", None)
-    except Exception as e:
+    except Exception:
         try:
             topic = await bot.create_forum_topic(chat_id, "Auto Index")
             return getattr(topic, "message_thread_id", None)
         except Exception:
             return None
-    cleaned = re.sub(r"[^\w\s\-\.,]", " ", name or "").strip()
-    cleaned = re.sub(r"\s+", " ", cleaned)
-    return cleaned[:limit] if limit else cleaned
 
 # ------------------ Bot Init ------------------
 bot = Client("ug", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
