@@ -1,0 +1,138 @@
+{
+  "files": {
+    "animation.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "app.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "auth.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "clean.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "db.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "draw.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "jbebwnqnwewwjn.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "logs.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "main.py": {
+      "syntax_ok": false,
+      "error": "expected an indented block after function definition on line 94 (main.py, line 98)",
+      "syntax_ok_after": false,
+      "error_after": "expected an indented block after function definition on line 94 (main.py, line 98)"
+    },
+    "run.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "secret.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "test.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "ug.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "utils.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "vars.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "main.backup.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    },
+    "ug.backup.py": {
+      "syntax_ok": true,
+      "error": null,
+      "syntax_ok_after": true,
+      "error_after": null
+    }
+  },
+  "issues": [
+    {
+      "file": "/mnt/data/ugupl_repo/Ugupl-main/main.py",
+      "error": "expected an indented block after function definition on line 94 (main.py, line 98)"
+    },
+    {
+      "file_after": "/mnt/data/ugupl_repo/Ugupl-main/main.py",
+      "error_after": "expected an indented block after function definition on line 94 (main.py, line 98)"
+    }
+  ],
+  "fixes": [
+    "Replaced get_or_create_forum_topic block in main.py"
+  ],
+  "files_list": [
+    "animation.py",
+    "app.py",
+    "auth.py",
+    "clean.py",
+    "db.py",
+    "draw.py",
+    "jbebwnqnwewwjn.py",
+    "logs.py",
+    "main.py",
+    "run.py",
+    "secret.py",
+    "test.py",
+    "ug.py",
+    "utils.py",
+    "vars.py",
+    "main.backup.py",
+    "ug.backup.py"
+  ]
+}

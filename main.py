@@ -96,30 +96,18 @@ def sanitize_filename(name: str, limit: int = 60) -> str:
 # --- Forum Topic Helpers (auto topic create & use) ---
 
 async def get_or_create_forum_topic(bot: Client, chat_id: int, title: str) -> Optional[int]:
-    """Create or fetch a forum topic thread id if the chat supports topics."""
+    chat = await bot.get_chat(chat_id)
+    if not getattr(chat, "is_forum", False):
+        return None
     try:
-        chat = await bot.get_chat(chat_id)
-        if not getattr(chat, "is_forum", False):
-            return None
-        # Pyrogram v2: create_forum_topic(chat_id, name, icon_color=None, icon_custom_emoji_id=None)
         name = (title or "Topic").strip()[:128]
         topic = await bot.create_forum_topic(chat_id, name)
-        return getattr(topic, "message_thread_id", None)
     except Exception:
         try:
             topic = await bot.create_forum_topic(chat_id, "Auto Index")
-            return getattr(topic, "message_thread_id", None)
         except Exception:
             return None
-
-# ------------------ Bot Init ------------------
-bot = Client("ug", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-register_clean_handler(bot)
-
-photologo = 'https://cdn.pixabay.com/photo/2025/05/21/02/38/ai-generated-9612673_1280.jpg'
-BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/TgXWarriors")]])
-
-# ------------------ /start ------------------
+    return getattr(topic, "message_thread_id", None)
 @bot.on_message(filters.command("start") & (filters.private | filters.group | filters.channel))
 async def start_cmd(client: Client, m: Message):
     try:
