@@ -17,6 +17,6 @@ https://youtu.be/PYDtSTM6w44?si=noKPl7o4iU9SR_TO
 
 ## Deploy Via Buttons
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/newgitupl/Ugupl.git)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/ankitbgp9006/V3.git)
 
 
