@@ -49,7 +49,7 @@ async def build_message_link(bot: Client, chat_id: int, message_id: int) -> str:
             return f"https://t.me/c/{cid[4:]}/{message_id}"
         return f"https://t.me/c/{abs(chat_id)}/{message_id}"
 
-def persist_topic_index_json(batch_name: str, topic_index: dict) -> str | None:
+def persist_topic_index_json(batch_name: str, topic_index: dict) -> typing.Optional[str]:
     safe = re.sub(r"[^\w\-_. ]", "_", batch_name or "batch")[:60]
     fname = f"topic_index_{safe}.json"
     try:
@@ -72,7 +72,7 @@ def try_db_save_index(batch_name: str, topic_index: dict):
 def sanitize_filename(name: str, limit: int = 60) -> str:
 
 # --- Forum Topic Helpers (auto topic create & use) ---
-async def get_or_create_forum_topic(bot: Client, chat_id: int, title: str) -> int | None:
+async def get_or_create_forum_topic(bot: Client, chat_id: int, title: str) -> typing.Optional[int]:
     """
     Create or fetch a forum topic in a supergroup with topics enabled.
     Returns the message_thread_id usable in send_* calls.
