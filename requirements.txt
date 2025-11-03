@@ -1,0 +1,13 @@
+pyrogram==2.0.106
+tgcrypto==1.2.5
+aiohttp==3.9.1
+yt-dlp==2023.11.14
+cloudscraper==1.2.71
+pytz==2023.3
+pytube==15.0.0
+beautifulsoup4==4.12.2
+pyromod==3.2.3
+requests==2.31.0
+python-dotenv==1.0.0
+pymongo==4.5.0
+colorama==0.4.6

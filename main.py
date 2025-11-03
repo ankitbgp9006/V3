@@ -1,4 +1,14 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()  # This loads .env file
+
+# Replace hardcoded values with environment variables
+API_ID = int(os.environ.get("API_ID"))
+API_HASH = os.environ.get("API_HASH")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
+
+import os
 import re
 import sys
 import m3u8
@@ -90,6 +100,19 @@ from pyrogram.errors import FloodWait, ChatAdminRequired, PeerIdInvalid
 from jbebwnqnwewwjn import get_apis
 from clean import register_clean_handler  # Add this import
 import string  # Add this import
+# Missing imports add karo
+from db import db
+import auth
+from clean import register_clean_handler
+
+# For missing jbebwnqnwewwjn - temporary fix
+def get_apis():
+    return {
+        "API_DRM": "https://drm-decrypter.herokuapp.com/",
+        "API_CLASSPLUS": "https://classplus-signer.herokuapp.com/"
+    }
+
+
 
 apis = get_apis()
 auto_flags = {}
@@ -107,7 +130,9 @@ bot = Client(
     "ug",
     api_id=API_ID,
     api_hash=API_HASH,
-    bot_token=BOT_TOKEN
+    bot_token=BOT_TOKEN,
+    plugins=dict(root="plugins")  # Important for Heroku
+)  # Important for Heroku
 )
 
 # Register command handlers
@@ -1635,19 +1660,27 @@ async def start_handler(client, message):
         print(f"Error in start handler: {str(e)}")
         await message.reply_text("An error occurred, please try again later.")
 
+# Add this at the VERY END of main.py
+import threading
+from aiohttp import web
+
+async def health_check(request):
+    return web.Response(text="Bot is running")
+
+def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', health_check)
+    web.run_app(app, host='0.0.0.0', port=int(os.getenv('PORT', 8080)))
+
 if __name__ == "__main__":
-    print("Starting Bot...")
-    while True:  # Keep trying to restart
-        try:
-            # Run the bot with the restart mechanism
-            bot.run(restart_on_error(bot))
-        except Exception as e:
-            print(f"Failed to start bot: {str(e)}")
-            # If bot fails to start, try to restart after delay
-            time.sleep(10)
-            # Try to stop the client if it's running
-            try:
-                bot.stop()
-            except:
-                pass
-            continue  # Try again
+    # Start web server for Heroku
+    threading.Thread(target=start_web_server, daemon=True).start()
+
+    # (Optional) register demo clean command
+    try:
+        register_clean_handler(bot)
+    except Exception as e:
+        print("Warning: clean handler not registered:", e)
+
+    print("🤖 Starting Telegram Bot...")
+    bot.run()
