@@ -1,14 +1,4 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()  # This loads .env file
-
-# Replace hardcoded values with environment variables
-API_ID = int(os.environ.get("API_ID"))
-API_HASH = os.environ.get("API_HASH")
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-
-
-import os
 import re
 import sys
 import m3u8
@@ -18,6 +8,46 @@ import pytz
 import asyncio
 import requests
 import subprocess
+import urllib.parse
+import yt_dlp
+import tgcrypto
+import cloudscraper
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from base64 import b64encode, b64decode
+from logs import logging
+from bs4 import BeautifulSoup
+import ug as helper
+from utils import progress_bar
+from vars import *
+from aiohttp import ClientSession
+from subprocess import getstatusoutput
+from pytube import YouTube
+from aiohttp import web
+import random
+from pyromod import listen
+from pyrogram import Client, filters, idle
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.errors import FloodWait, BadRequest, Unauthorized, SessionExpired, AuthKeyDuplicated, AuthKeyUnregistered
+from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified
+from pyrogram.types.messages_and_media import message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import aiohttp
+import aiofiles
+import zipfile
+import shutil
+import ffmpeg
+from datetime import datetime, timedelta
+from pyrogram.handlers import MessageHandler
+from pyrogram.types import CallbackQuery
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+API_ID = int(os.environ.get("API_ID"))
+API_HASH = os.environ.get("API_HASH")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+
 import urllib
 import urllib.parse
 import yt_dlp
